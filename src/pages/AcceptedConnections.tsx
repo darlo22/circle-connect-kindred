@@ -1,7 +1,7 @@
 
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { UserCheck, Calendar, MessageSquareCheck, ArrowRight } from 'lucide-react';
+import { UserCheck, Calendar, MessageSquare, ArrowRight } from 'lucide-react';
 import Layout from '../components/layout/Layout';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
@@ -231,7 +231,7 @@ const AcceptedConnections: React.FC = () => {
                             className="h-8 bg-green-500 hover:bg-green-600 text-white"
                             onClick={() => handleProvideFeedback(connection.id)}
                           >
-                            <MessageSquareCheck className="mr-1 h-3.5 w-3.5" />
+                            <MessageSquare className="mr-1 h-3.5 w-3.5" />
                             Feedback
                           </Button>
                         )}
@@ -302,7 +302,7 @@ const AcceptedConnections: React.FC = () => {
               </div>
               <div className="flex items-start gap-3">
                 <div className="bg-teal/10 p-1.5 rounded-full">
-                  <MessageSquareCheck className="h-4 w-4 text-teal" />
+                  <MessageSquare className="h-4 w-4 text-teal" />
                 </div>
                 <div>
                   <p className="font-medium text-navy">Provide honest feedback</p>
