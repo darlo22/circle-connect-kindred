@@ -1,5 +1,6 @@
 
 import React from 'react';
+import { Link, useNavigate } from 'react-router-dom';
 import { ArrowRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
@@ -43,11 +44,21 @@ const matches = [
 ];
 
 const MatchGrid: React.FC = () => {
+  const navigate = useNavigate();
+  
+  const handleViewAllMatches = () => {
+    navigate('/matches');
+  };
+  
   return (
     <div className="bg-white rounded-xl shadow-md p-6 mb-6">
       <div className="flex justify-between items-center mb-6">
         <h2 className="text-xl font-bold text-navy">Recent Matches</h2>
-        <Button variant="ghost" className="flex items-center gap-1 text-teal hover:text-teal">
+        <Button 
+          variant="ghost" 
+          className="flex items-center gap-1 text-teal hover:text-teal"
+          onClick={handleViewAllMatches}
+        >
           View All <ArrowRight size={16} />
         </Button>
       </div>
@@ -107,19 +118,23 @@ const MatchGrid: React.FC = () => {
               </div>
               
               <div className="mt-4 grid grid-cols-2 gap-2">
-                <Button 
-                  variant="outline"
-                  size="sm"
-                  className="text-sm"
-                >
-                  View Profile
-                </Button>
-                <Button 
-                  size="sm" 
-                  className="bg-teal hover:bg-teal/90 text-white text-sm"
-                >
-                  Connect
-                </Button>
+                <Link to={`/match/${match.id}`}>
+                  <Button 
+                    variant="outline"
+                    size="sm"
+                    className="text-sm w-full"
+                  >
+                    View Profile
+                  </Button>
+                </Link>
+                <Link to={`/connection/${match.id}`}>
+                  <Button 
+                    size="sm" 
+                    className="bg-teal hover:bg-teal/90 text-white text-sm w-full"
+                  >
+                    Connect
+                  </Button>
+                </Link>
               </div>
             </div>
           </div>

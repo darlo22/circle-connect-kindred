@@ -8,12 +8,16 @@ interface DashboardHeaderProps {
   groupName: string;
   memberCount: number;
   matchesCount: number;
+  onGroupUpdatesClick?: () => void;
+  onRequestMatchClick?: () => void;
 }
 
 const DashboardHeader: React.FC<DashboardHeaderProps> = ({
   groupName,
   memberCount,
-  matchesCount
+  matchesCount,
+  onGroupUpdatesClick,
+  onRequestMatchClick
 }) => {
   return (
     <div className="bg-white rounded-xl shadow-md p-6 mb-6">
@@ -44,11 +48,20 @@ const DashboardHeader: React.FC<DashboardHeaderProps> = ({
           </div>
         </div>
         <div className="flex gap-3">
-          <Button variant="outline" className="flex items-center gap-2">
+          <Button 
+            variant="outline" 
+            className="flex items-center gap-2"
+            onClick={onGroupUpdatesClick}
+          >
             <Bell size={16} />
             Group Updates
           </Button>
-          <Button className="bg-teal hover:bg-teal/90 text-white">Request Match</Button>
+          <Button 
+            className="bg-teal hover:bg-teal/90 text-white"
+            onClick={onRequestMatchClick}
+          >
+            Request Match
+          </Button>
         </div>
       </div>
     </div>
