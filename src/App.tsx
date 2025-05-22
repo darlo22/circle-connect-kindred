@@ -15,6 +15,7 @@ import Connection from "./pages/Connection";
 import GroupUpdates from "./pages/GroupUpdates";
 import PlanMeetup from "./pages/PlanMeetup";
 import MeetupFeedback from "./pages/MeetupFeedback";
+import AcceptedConnections from "./pages/AcceptedConnections";
 import About from "./pages/About";
 import FindGroups from "./pages/FindGroups";
 import Privacy from "./pages/Privacy";
@@ -37,6 +38,7 @@ const App = () => (
           <Route path="/login" element={<Login />} />
           <Route path="/match/:id" element={<MatchProfile id={''} />} />
           <Route path="/matches" element={<Matches />} />
+          <Route path="/accepted-connections" element={<AcceptedConnections />} />
           <Route path="/connection/:id" element={<Connection />} />
           <Route path="/group-updates" element={<GroupUpdates />} />
           <Route path="/plan-meetup/:id" element={<PlanMeetup />} />

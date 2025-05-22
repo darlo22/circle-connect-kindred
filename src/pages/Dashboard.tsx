@@ -6,6 +6,8 @@ import DashboardHeader from '../components/dashboard/DashboardHeader';
 import StatCards from '../components/dashboard/StatCards';
 import MatchGrid from '../components/dashboard/MatchGrid';
 import ActivityFeed from '../components/dashboard/ActivityFeed';
+import { Button } from '@/components/ui/button';
+import { UserCheck } from 'lucide-react';
 
 const Dashboard: React.FC = () => {
   const navigate = useNavigate();
@@ -28,6 +30,16 @@ const Dashboard: React.FC = () => {
           onGroupUpdatesClick={handleGroupUpdates}
           onRequestMatchClick={handleRequestMatch}
         />
+        
+        <div className="flex justify-end mb-4">
+          <Button
+            className="bg-teal hover:bg-teal/90 text-white flex items-center gap-2"
+            onClick={() => navigate('/accepted-connections')}
+          >
+            <UserCheck className="h-4 w-4" />
+            View Accepted Connections
+          </Button>
+        </div>
         
         <StatCards />
         
