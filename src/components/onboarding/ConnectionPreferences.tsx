@@ -22,6 +22,7 @@ interface ConnectionPreferencesData {
   intent: string;
   budget: string;
   interests: string[];
+  values: string[];
 }
 
 const interestOptions = [
@@ -42,11 +43,27 @@ const interestOptions = [
   { id: 'photography', label: 'Photography' }
 ];
 
+const valueOptions = [
+  { id: 'family', label: 'Family' },
+  { id: 'honesty', label: 'Honesty & Integrity' },
+  { id: 'ambition', label: 'Ambition & Hard Work' },
+  { id: 'kindness', label: 'Kindness & Compassion' },
+  { id: 'creativity', label: 'Creativity' },
+  { id: 'independence', label: 'Independence' },
+  { id: 'loyalty', label: 'Loyalty' },
+  { id: 'humor', label: 'Humor' },
+  { id: 'spirituality', label: 'Spirituality' },
+  { id: 'balance', label: 'Work-Life Balance' },
+  { id: 'education', label: 'Education' },
+  { id: 'diversity', label: 'Diversity & Inclusion' }
+];
+
 const ConnectionPreferences: React.FC<ConnectionPreferencesProps> = ({ onNext }) => {
   const [preferences, setPreferences] = useState<ConnectionPreferencesData>({
     intent: '',
     budget: '',
-    interests: []
+    interests: [],
+    values: []
   });
   
   const [errors, setErrors] = useState<Record<string, string>>({});
@@ -78,6 +95,20 @@ const ConnectionPreferences: React.FC<ConnectionPreferencesProps> = ({ onNext })
       setErrors(prev => ({ ...prev, interests: '' }));
     }
   };
+
+  const handleValueChange = (value: string, checked: boolean) => {
+    setPreferences(prev => {
+      const newValues = checked
+        ? [...prev.values, value]
+        : prev.values.filter(v => v !== value);
+
+      return { ...prev, values: newValues };
+    });
+    
+    if (errors.values) {
+      setErrors(prev => ({ ...prev, values: '' }));
+    }
+  };
   
   const validateForm = () => {
     const newErrors: Record<string, string> = {};
@@ -92,6 +123,10 @@ const ConnectionPreferences: React.FC<ConnectionPreferencesProps> = ({ onNext })
     
     if (preferences.interests.length < 3) {
       newErrors.interests = 'Please select at least 3 interests';
+    }
+    
+    if (preferences.values.length < 2) {
+      newErrors.values = 'Please select at least 2 values';
     }
     
     setErrors(newErrors);
@@ -154,17 +189,17 @@ const ConnectionPreferences: React.FC<ConnectionPreferencesProps> = ({ onNext })
             </span>
           </div>
           
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-2 max-h-60 overflow-y-auto p-1">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-2 max-h-40 overflow-y-auto p-1">
             {interestOptions.map((interest) => (
               <div key={interest.id} className="flex items-center space-x-2">
                 <Checkbox 
-                  id={interest.id} 
+                  id={`interest-${interest.id}`} 
                   checked={preferences.interests.includes(interest.id)}
                   onCheckedChange={(checked) => 
                     handleInterestChange(interest.id, checked as boolean)
                   }
                 />
-                <Label htmlFor={interest.id} className="text-sm cursor-pointer">
+                <Label htmlFor={`interest-${interest.id}`} className="text-sm cursor-pointer">
                   {interest.label}
                 </Label>
               </div>
@@ -173,8 +208,37 @@ const ConnectionPreferences: React.FC<ConnectionPreferencesProps> = ({ onNext })
           {errors.interests && (
             <p className="text-red-500 text-sm">{errors.interests}</p>
           )}
+        </div>
+
+        <div className="space-y-3">
+          <div className="flex justify-between items-center">
+            <Label>Values & Beliefs</Label>
+            <span className="text-sm text-gray-500">
+              Selected: {preferences.values.length}/12
+            </span>
+          </div>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-2 max-h-40 overflow-y-auto p-1">
+            {valueOptions.map((value) => (
+              <div key={value.id} className="flex items-center space-x-2">
+                <Checkbox 
+                  id={`value-${value.id}`} 
+                  checked={preferences.values.includes(value.id)}
+                  onCheckedChange={(checked) => 
+                    handleValueChange(value.id, checked as boolean)
+                  }
+                />
+                <Label htmlFor={`value-${value.id}`} className="text-sm cursor-pointer">
+                  {value.label}
+                </Label>
+              </div>
+            ))}
+          </div>
+          {errors.values && (
+            <p className="text-red-500 text-sm">{errors.values}</p>
+          )}
           <p className="text-sm text-gray-500 italic">
-            Select at least 3 interests that you enjoy or are passionate about.
+            Select values that are most important to you in forming meaningful connections.
           </p>
         </div>
       </div>

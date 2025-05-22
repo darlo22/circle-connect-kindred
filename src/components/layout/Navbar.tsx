@@ -10,6 +10,14 @@ const Navbar: React.FC = () => {
   // Simulating authenticated state - will be replaced with actual auth state later
   const [isAuthenticated, setIsAuthenticated] = useState(false);
 
+  const handleScrollToSection = (sectionId: string) => {
+    setIsMenuOpen(false);
+    const element = document.getElementById(sectionId);
+    if (element) {
+      element.scrollIntoView({ behavior: 'smooth' });
+    }
+  };
+
   return (
     <header className="fixed top-0 left-0 w-full bg-white/90 backdrop-blur-sm z-40 shadow-sm">
       <nav className="container-custom py-4">
@@ -38,9 +46,24 @@ const Navbar: React.FC = () => {
               </>
             ) : (
               <>
-                <Link to="/#features" className="text-navy hover:text-teal transition-colors">Features</Link>
-                <Link to="/#how-it-works" className="text-navy hover:text-teal transition-colors">How It Works</Link>
-                <Link to="/#testimonials" className="text-navy hover:text-teal transition-colors">Testimonials</Link>
+                <button 
+                  onClick={() => handleScrollToSection('features')} 
+                  className="text-navy hover:text-teal transition-colors"
+                >
+                  Features
+                </button>
+                <button 
+                  onClick={() => handleScrollToSection('how-it-works')} 
+                  className="text-navy hover:text-teal transition-colors"
+                >
+                  How It Works
+                </button>
+                <button 
+                  onClick={() => handleScrollToSection('testimonials')} 
+                  className="text-navy hover:text-teal transition-colors"
+                >
+                  Testimonials
+                </button>
                 <div className="space-x-2">
                   <Link to="/login" className="btn-outline">Log In</Link>
                   <Link to="/onboarding" className="btn-primary">Sign Up</Link>
@@ -103,27 +126,24 @@ const Navbar: React.FC = () => {
                 </>
               ) : (
                 <>
-                  <Link 
-                    to="/#features" 
-                    className="text-navy hover:text-teal py-2 px-4 rounded-lg hover:bg-gray-50 transition-colors"
-                    onClick={() => setIsMenuOpen(false)}
+                  <button
+                    onClick={() => handleScrollToSection('features')}
+                    className="text-navy hover:text-teal py-2 px-4 rounded-lg hover:bg-gray-50 transition-colors text-left"
                   >
                     Features
-                  </Link>
-                  <Link 
-                    to="/#how-it-works" 
-                    className="text-navy hover:text-teal py-2 px-4 rounded-lg hover:bg-gray-50 transition-colors"
-                    onClick={() => setIsMenuOpen(false)}
+                  </button>
+                  <button
+                    onClick={() => handleScrollToSection('how-it-works')}
+                    className="text-navy hover:text-teal py-2 px-4 rounded-lg hover:bg-gray-50 transition-colors text-left"
                   >
                     How It Works
-                  </Link>
-                  <Link 
-                    to="/#testimonials" 
-                    className="text-navy hover:text-teal py-2 px-4 rounded-lg hover:bg-gray-50 transition-colors"
-                    onClick={() => setIsMenuOpen(false)}
+                  </button>
+                  <button
+                    onClick={() => handleScrollToSection('testimonials')}
+                    className="text-navy hover:text-teal py-2 px-4 rounded-lg hover:bg-gray-50 transition-colors text-left"
                   >
                     Testimonials
-                  </Link>
+                  </button>
                   <div className="pt-2 grid grid-cols-2 gap-2">
                     <Link 
                       to="/login" 
