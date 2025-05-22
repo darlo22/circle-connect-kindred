@@ -19,7 +19,7 @@ const blogPosts = [
   {
     id: '2',
     title: 'Building Community in the Digital Age: Why Trust Matters',
-    excerpt: 'How CircleMate's community-first approach is changing the landscape of social connections.',
+    excerpt: 'How CircleMate\'s community-first approach is changing the landscape of social connections.',
     image: 'https://images.unsplash.com/photo-1515187029135-18ee286d815b',
     author: 'Michael Okonkwo',
     date: 'May 8, 2025',
