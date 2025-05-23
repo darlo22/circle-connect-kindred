@@ -1,14 +1,17 @@
 
 import React from 'react';
 import { Badge } from '@/components/ui/badge';
-import { Users } from 'lucide-react';
+import { Users, Shield } from 'lucide-react';
 import { Community } from '@/types/community';
+import { Link } from 'react-router-dom';
+import { Button } from '@/components/ui/button';
 
 interface CommunityHeaderProps {
   community: Community;
+  isAdmin?: boolean;
 }
 
-const CommunityHeader: React.FC<CommunityHeaderProps> = ({ community }) => {
+const CommunityHeader: React.FC<CommunityHeaderProps> = ({ community, isAdmin = true }) => {
   return (
     <div className="relative">
       {/* Banner Image */}
@@ -32,6 +35,22 @@ const CommunityHeader: React.FC<CommunityHeaderProps> = ({ community }) => {
           </div>
         </div>
       </div>
+
+      {/* Admin Dashboard Button */}
+      {isAdmin && (
+        <div className="absolute top-4 right-4">
+          <Button 
+            variant="outline" 
+            className="bg-white/20 text-white hover:bg-white/30 border-none"
+            asChild
+          >
+            <Link to="/admin/dashboard" className="flex items-center gap-2">
+              <Shield size={16} />
+              Admin Dashboard
+            </Link>
+          </Button>
+        </div>
+      )}
     </div>
   );
 };

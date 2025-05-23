@@ -23,6 +23,7 @@ import Terms from "./pages/Terms";
 import FAQ from "./pages/FAQ";
 import Blog from "./pages/Blog";
 import CommunityProfile from "./pages/CommunityProfile";
+import AdminDashboard from "./pages/AdminDashboard";
 
 const queryClient = new QueryClient();
 
@@ -51,6 +52,7 @@ const App = () => (
           <Route path="/faq" element={<FAQ />} />
           <Route path="/blog" element={<Blog />} />
           <Route path="/community/:id" element={<CommunityProfile />} />
+          <Route path="/admin/dashboard" element={<AdminDashboard />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>
