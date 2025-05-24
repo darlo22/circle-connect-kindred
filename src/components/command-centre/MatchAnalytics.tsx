@@ -19,6 +19,21 @@ const topRejectionReasons = [
   { reason: 'Communication Issues', percentage: 12 },
 ];
 
+const chartConfig = {
+  successRate: { 
+    color: '#1FBAB4',
+    label: 'Success Rate %'
+  },
+  rejections: { 
+    color: '#FF9500',
+    label: 'Rejections %'
+  },
+  noShows: { 
+    color: '#f87171',
+    label: 'No-Shows %'
+  }
+};
+
 const MatchAnalytics = () => {
   return (
     <div className="space-y-6">
@@ -28,7 +43,7 @@ const MatchAnalytics = () => {
         </CardHeader>
         <CardContent>
           <div className="h-[300px]">
-            <ChartContainer className="h-full w-full">
+            <ChartContainer config={chartConfig} className="h-full w-full">
               <ResponsiveContainer width="100%" height="100%">
                 <BarChart data={mockAnalyticsData}>
                   <CartesianGrid strokeDasharray="3 3" />

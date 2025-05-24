@@ -2,7 +2,7 @@
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Download, FileSpreadsheet, FilePdf, Calendar, Users, CreditCard, AlertTriangle } from 'lucide-react';
+import { Download, FileSpreadsheet, FileText, Calendar, Users, CreditCard, AlertTriangle } from 'lucide-react';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 
 const reportTypes = [
@@ -105,7 +105,7 @@ const ReportsPanel = () => {
                   )}
                   {report.format.includes('PDF') && (
                     <Button variant="outline" size="sm" className="flex items-center gap-1">
-                      <FilePdf className="h-4 w-4" />
+                      <FileText className="h-4 w-4" />
                       PDF
                     </Button>
                   )}
