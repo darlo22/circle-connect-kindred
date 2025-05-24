@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import {
   Table,
@@ -12,6 +12,16 @@ import {
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { AlertCircle, Bell, CheckCircle, XCircle } from 'lucide-react';
+import { useToast } from '@/hooks/use-toast';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+} from '@/components/ui/dialog';
+import { Textarea } from '@/components/ui/textarea';
 
 const mockReportedItems = [
   { 
@@ -53,6 +63,55 @@ const mockReportedItems = [
 ];
 
 const ModeratorTools = () => {
+  const [reportItems, setReportItems] = useState(mockReportedItems);
+  const [approveItem, setApproveItem] = useState(null);
+  const [rejectItem, setRejectItem] = useState(null);
+  const { toast } = useToast();
+
+  const handleApproveReport = (item) => {
+    setApproveItem(item);
+  };
+
+  const handleRejectReport = (item) => {
+    setRejectItem(item);
+  };
+
+  const confirmApprove = () => {
+    if (!approveItem) return;
+    
+    // Update the status of the item
+    const updatedItems = reportItems.map(item => 
+      item.id === approveItem.id ? {...item, status: 'resolved'} : item
+    );
+    
+    setReportItems(updatedItems);
+    toast({
+      title: "Report Approved",
+      description: `Action taken on ${approveItem.type.toLowerCase()} report for ${approveItem.target}`,
+      variant: "default"
+    });
+    
+    setApproveItem(null);
+  };
+
+  const confirmReject = () => {
+    if (!rejectItem) return;
+    
+    // Update the status of the item
+    const updatedItems = reportItems.map(item => 
+      item.id === rejectItem.id ? {...item, status: 'resolved'} : item
+    );
+    
+    setReportItems(updatedItems);
+    toast({
+      title: "Report Dismissed",
+      description: `Report for ${rejectItem.target} has been dismissed`,
+      variant: "default"
+    });
+    
+    setRejectItem(null);
+  };
+
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
@@ -77,7 +136,7 @@ const ModeratorTools = () => {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {mockReportedItems.map((item) => (
+              {reportItems.map((item) => (
                 <TableRow key={item.id}>
                   <TableCell>
                     <Badge variant="outline" className="bg-gray-50">
@@ -91,10 +150,20 @@ const ModeratorTools = () => {
                   <TableCell>
                     {item.status === 'pending' ? (
                       <div className="flex items-center gap-1">
-                        <Button variant="outline" size="sm" className="text-green-600">
+                        <Button 
+                          variant="outline" 
+                          size="sm" 
+                          className="text-green-600"
+                          onClick={() => handleApproveReport(item)}
+                        >
                           <CheckCircle className="h-4 w-4" />
                         </Button>
-                        <Button variant="outline" size="sm" className="text-red-600">
+                        <Button 
+                          variant="outline" 
+                          size="sm" 
+                          className="text-red-600"
+                          onClick={() => handleRejectReport(item)}
+                        >
                           <XCircle className="h-4 w-4" />
                         </Button>
                       </div>
@@ -142,6 +211,72 @@ const ModeratorTools = () => {
           </CardContent>
         </Card>
       </div>
+
+      {/* Approve Dialog */}
+      <Dialog open={!!approveItem} onOpenChange={(open) => !open && setApproveItem(null)}>
+        <DialogContent>
+          {approveItem && (
+            <>
+              <DialogHeader>
+                <DialogTitle>Approve Report Action</DialogTitle>
+                <DialogDescription>
+                  Take action on the report against {approveItem.target}
+                </DialogDescription>
+              </DialogHeader>
+              <div className="space-y-4 py-4">
+                <div>
+                  <h3 className="text-sm font-medium mb-1">Report Details</h3>
+                  <p className="text-sm text-gray-600">
+                    Type: <span className="font-medium">{approveItem.type}</span>
+                  </p>
+                  <p className="text-sm text-gray-600">
+                    Reason: <span className="font-medium">{approveItem.reason}</span>
+                  </p>
+                </div>
+                
+                <div className="space-y-2">
+                  <h3 className="text-sm font-medium">Admin Notes</h3>
+                  <Textarea placeholder="Add your notes about this action..." />
+                </div>
+              </div>
+              <DialogFooter>
+                <Button variant="outline" onClick={() => setApproveItem(null)}>Cancel</Button>
+                <Button variant="default" onClick={confirmApprove}>
+                  Approve Report
+                </Button>
+              </DialogFooter>
+            </>
+          )}
+        </DialogContent>
+      </Dialog>
+
+      {/* Reject Dialog */}
+      <Dialog open={!!rejectItem} onOpenChange={(open) => !open && setRejectItem(null)}>
+        <DialogContent>
+          {rejectItem && (
+            <>
+              <DialogHeader>
+                <DialogTitle>Dismiss Report</DialogTitle>
+                <DialogDescription>
+                  Dismiss the report against {rejectItem.target}
+                </DialogDescription>
+              </DialogHeader>
+              <div className="space-y-4 py-4">
+                <div className="space-y-2">
+                  <h3 className="text-sm font-medium">Dismissal Reason</h3>
+                  <Textarea placeholder="Explain why this report is being dismissed..." />
+                </div>
+              </div>
+              <DialogFooter>
+                <Button variant="outline" onClick={() => setRejectItem(null)}>Cancel</Button>
+                <Button variant="destructive" onClick={confirmReject}>
+                  Dismiss Report
+                </Button>
+              </DialogFooter>
+            </>
+          )}
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };

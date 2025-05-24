@@ -1,9 +1,18 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Download, FileSpreadsheet, FileText, Calendar, Users, CreditCard, AlertTriangle } from 'lucide-react';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { useToast } from '@/hooks/use-toast';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+  DialogFooter,
+} from '@/components/ui/dialog';
 
 const reportTypes = [
   { name: 'Community Activity', icon: Users, format: ['CSV', 'PDF'] },
@@ -14,6 +23,71 @@ const reportTypes = [
 ];
 
 const ReportsPanel = () => {
+  const [reportType, setReportType] = useState("community");
+  const [dateRange, setDateRange] = useState("30days");
+  const [format, setFormat] = useState("csv");
+  const [showGeneratingDialog, setShowGeneratingDialog] = useState(false);
+  const [downloadReady, setDownloadReady] = useState(false);
+  const { toast } = useToast();
+
+  const handleGenerateReport = () => {
+    setShowGeneratingDialog(true);
+    
+    // Simulate report generation
+    setTimeout(() => {
+      setDownloadReady(true);
+    }, 1500);
+  };
+  
+  const handleDownload = (reportName, fileFormat) => {
+    toast({
+      title: `Report Downloaded`,
+      description: `${reportName} has been downloaded as ${fileFormat}`,
+    });
+    
+    // Create and trigger a download based on the format
+    if (fileFormat === 'CSV') {
+      downloadCSV(reportName);
+    } else {
+      downloadPDF(reportName);
+    }
+  };
+  
+  const downloadCSV = (reportName) => {
+    // Create sample CSV content
+    let csvContent = `"Date","Category","Value"\n`;
+    csvContent += `"2025-05-01","Users","1245"\n`;
+    csvContent += `"2025-05-08","Users","1389"\n`;
+    csvContent += `"2025-05-15","Users","1502"\n`;
+    csvContent += `"2025-05-22","Users","1687"\n`;
+    
+    // Create a blob and download link
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement('a');
+    const url = URL.createObjectURL(blob);
+    
+    link.setAttribute('href', url);
+    link.setAttribute('download', `${reportName.replace(/\s/g, '_')}_report.csv`);
+    link.style.visibility = 'hidden';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+  
+  const downloadPDF = (reportName) => {
+    // In a real app, you would generate a PDF here
+    // For this demo, we'll just simulate the download
+    toast({
+      title: "PDF Generated",
+      description: "PDF generation would require a PDF library in a real application",
+    });
+  };
+
+  const closeGeneratingDialog = () => {
+    setShowGeneratingDialog(false);
+    setDownloadReady(false);
+  };
+
   return (
     <div className="space-y-6">
       <Card>
@@ -25,7 +99,7 @@ const ReportsPanel = () => {
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <div className="space-y-2">
                 <label className="text-sm font-medium">Report Type</label>
-                <Select defaultValue="community">
+                <Select value={reportType} onValueChange={setReportType}>
                   <SelectTrigger>
                     <SelectValue placeholder="Select report type" />
                   </SelectTrigger>
@@ -41,7 +115,7 @@ const ReportsPanel = () => {
               
               <div className="space-y-2">
                 <label className="text-sm font-medium">Date Range</label>
-                <Select defaultValue="30days">
+                <Select value={dateRange} onValueChange={setDateRange}>
                   <SelectTrigger>
                     <SelectValue placeholder="Select date range" />
                   </SelectTrigger>
@@ -57,7 +131,7 @@ const ReportsPanel = () => {
               
               <div className="space-y-2">
                 <label className="text-sm font-medium">Format</label>
-                <Select defaultValue="csv">
+                <Select value={format} onValueChange={setFormat}>
                   <SelectTrigger>
                     <SelectValue placeholder="Select format" />
                   </SelectTrigger>
@@ -70,7 +144,7 @@ const ReportsPanel = () => {
             </div>
             
             <div className="flex justify-end">
-              <Button className="flex items-center gap-2">
+              <Button className="flex items-center gap-2" onClick={handleGenerateReport}>
                 <Download className="h-4 w-4" />
                 Generate Report
               </Button>
@@ -98,13 +172,23 @@ const ReportsPanel = () => {
                 </div>
                 <div className="flex gap-2">
                   {report.format.includes('CSV') && (
-                    <Button variant="outline" size="sm" className="flex items-center gap-1">
+                    <Button 
+                      variant="outline" 
+                      size="sm" 
+                      className="flex items-center gap-1"
+                      onClick={() => handleDownload(report.name, 'CSV')}
+                    >
                       <FileSpreadsheet className="h-4 w-4" />
                       CSV
                     </Button>
                   )}
                   {report.format.includes('PDF') && (
-                    <Button variant="outline" size="sm" className="flex items-center gap-1">
+                    <Button 
+                      variant="outline" 
+                      size="sm" 
+                      className="flex items-center gap-1"
+                      onClick={() => handleDownload(report.name, 'PDF')}
+                    >
                       <FileText className="h-4 w-4" />
                       PDF
                     </Button>
@@ -115,6 +199,74 @@ const ReportsPanel = () => {
           </div>
         </CardContent>
       </Card>
+
+      {/* Report Generating Dialog */}
+      <Dialog open={showGeneratingDialog} onOpenChange={closeGeneratingDialog}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>
+              {downloadReady ? "Report Ready" : "Generating Report"}
+            </DialogTitle>
+            <DialogDescription>
+              {downloadReady 
+                ? "Your report has been generated and is ready to download" 
+                : "Please wait while we generate your report..."}
+            </DialogDescription>
+          </DialogHeader>
+          
+          <div className="py-6">
+            {!downloadReady ? (
+              <div className="flex flex-col items-center">
+                <div className="animate-pulse flex space-x-4 mb-4">
+                  <div className="h-12 w-12 bg-teal/30 rounded-full"></div>
+                </div>
+                <p className="text-sm text-gray-500">This may take a few moments</p>
+              </div>
+            ) : (
+              <div className="space-y-6">
+                <div className="bg-green-50 text-green-700 p-4 rounded-md flex items-center gap-3">
+                  <CheckCircle className="h-5 w-5" />
+                  <span>Report successfully generated</span>
+                </div>
+                
+                <div className="flex justify-center gap-4">
+                  <Button 
+                    variant="outline"
+                    className="flex items-center gap-2"
+                    onClick={() => {
+                      const reportName = reportTypes.find(r => r.name.toLowerCase().includes(reportType))?.name || 'Report';
+                      handleDownload(reportName, 'CSV');
+                      closeGeneratingDialog();
+                    }}
+                  >
+                    <FileSpreadsheet className="h-4 w-4" />
+                    Download CSV
+                  </Button>
+                  
+                  <Button 
+                    variant="outline"
+                    className="flex items-center gap-2"
+                    onClick={() => {
+                      const reportName = reportTypes.find(r => r.name.toLowerCase().includes(reportType))?.name || 'Report';
+                      handleDownload(reportName, 'PDF');
+                      closeGeneratingDialog();
+                    }}
+                  >
+                    <FileText className="h-4 w-4" />
+                    Download PDF
+                  </Button>
+                </div>
+              </div>
+            )}
+          </div>
+          
+          <DialogFooter>
+            {downloadReady && (
+              <Button onClick={closeGeneratingDialog}>Close</Button>
+            )}
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };

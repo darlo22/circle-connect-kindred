@@ -3,6 +3,9 @@ import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { ChartContainer } from '@/components/ui/chart';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from 'recharts';
+import { Button } from '@/components/ui/button';
+import { Download } from 'lucide-react';
+import { useToast } from '@/hooks/use-toast';
 
 const mockAnalyticsData = [
   { region: 'North', successRate: 78, rejections: 22, noShows: 8 },
@@ -35,8 +38,77 @@ const chartConfig = {
 };
 
 const MatchAnalytics = () => {
+  const { toast } = useToast();
+
+  const handleExportReports = (format: 'csv' | 'pdf') => {
+    toast({
+      title: `Report Exported`,
+      description: `Match analytics report has been exported as ${format.toUpperCase()}`,
+    });
+    
+    if (format === 'csv') {
+      downloadCSV();
+    } else {
+      downloadPDF();
+    }
+  };
+  
+  const downloadCSV = () => {
+    // Create CSV content from mockAnalyticsData
+    let csvContent = "Region,Success Rate,Rejections,No-Shows\n";
+    
+    mockAnalyticsData.forEach(row => {
+      csvContent += `${row.region},${row.successRate},${row.rejections},${row.noShows}\n`;
+    });
+    
+    // Create a blob and download it
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement('a');
+    const url = URL.createObjectURL(blob);
+    
+    link.setAttribute('href', url);
+    link.setAttribute('download', 'match_analytics.csv');
+    link.style.visibility = 'hidden';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+  
+  const downloadPDF = () => {
+    // In a real app, you would generate a PDF here
+    // For this demo, we'll simulate it
+    toast({
+      title: "PDF Generated",
+      description: "PDF generation would require a PDF library in a real application",
+    });
+  };
+
   return (
     <div className="space-y-6">
+      <div className="flex justify-between items-center">
+        <h3 className="text-lg font-medium">Match Performance</h3>
+        <div className="flex gap-2">
+          <Button 
+            onClick={() => handleExportReports('csv')}
+            variant="outline" 
+            size="sm" 
+            className="flex items-center gap-1"
+          >
+            <Download className="h-4 w-4" />
+            Export CSV
+          </Button>
+          <Button 
+            onClick={() => handleExportReports('pdf')}
+            variant="outline" 
+            size="sm" 
+            className="flex items-center gap-1"
+          >
+            <Download className="h-4 w-4" />
+            Export PDF
+          </Button>
+        </div>
+      </div>
+
       <Card>
         <CardHeader>
           <CardTitle>Match Success by Region</CardTitle>
