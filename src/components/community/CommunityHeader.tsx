@@ -36,21 +36,19 @@ const CommunityHeader: React.FC<CommunityHeaderProps> = ({ community, isAdmin = 
         </div>
       </div>
 
-      {/* Admin Dashboard Button */}
-      {isAdmin && (
-        <div className="absolute top-4 right-4">
-          <Button 
-            variant="outline" 
-            className="bg-white/20 text-white hover:bg-white/30 border-none"
-            asChild
-          >
-            <Link to="/admin/dashboard" className="flex items-center gap-2">
-              <Shield size={16} />
-              Admin Dashboard
-            </Link>
-          </Button>
-        </div>
-      )}
+      {/* Admin Dashboard Button - Always visible now */}
+      <div className="absolute top-4 right-4">
+        <Button 
+          variant="outline" 
+          className="bg-white/20 text-white hover:bg-white/30 border-none"
+          asChild
+        >
+          <Link to="/admin/dashboard" className="flex items-center gap-2">
+            <Shield size={16} />
+            Admin Dashboard
+          </Link>
+        </Button>
+      </div>
     </div>
   );
 };
