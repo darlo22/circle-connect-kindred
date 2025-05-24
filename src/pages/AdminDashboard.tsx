@@ -1,16 +1,13 @@
 
-import React, { useState } from 'react';
+import React from 'react';
 import Layout from '@/components/layout/Layout';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
-import { 
-  Users, 
-  Settings, 
-  Calendar, 
-  Bell, 
-  Shield 
-} from 'lucide-react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Users, Settings, Calendar, Bell, Shield } from 'lucide-react';
 import AdminSettings from '@/components/admin/AdminSettings';
+import AdminMembers from '@/components/admin/AdminMembers';
+import AdminRules from '@/components/admin/AdminRules';
+import AdminMeetups from '@/components/admin/AdminMeetups';
+import AdminAnnouncements from '@/components/admin/AdminAnnouncements';
 
 const AdminDashboard: React.FC = () => {
   return (
@@ -45,67 +42,19 @@ const AdminDashboard: React.FC = () => {
           </div>
           
           <TabsContent value="members">
-            <Card>
-              <CardHeader>
-                <CardTitle>Members Management</CardTitle>
-                <CardDescription>
-                  Manage community members, approve join requests, and handle blacklist.
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="h-64 flex items-center justify-center border rounded-md bg-muted/20">
-                  <p className="text-muted-foreground">Member management components will be displayed here</p>
-                </div>
-              </CardContent>
-            </Card>
+            <AdminMembers />
           </TabsContent>
           
           <TabsContent value="rules">
-            <Card>
-              <CardHeader>
-                <CardTitle>Community Matching Rules</CardTitle>
-                <CardDescription>
-                  Configure matching rules and criteria for your community members.
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="h-64 flex items-center justify-center border rounded-md bg-muted/20">
-                  <p className="text-muted-foreground">Rules management components will be displayed here</p>
-                </div>
-              </CardContent>
-            </Card>
+            <AdminRules />
           </TabsContent>
           
           <TabsContent value="meetups">
-            <Card>
-              <CardHeader>
-                <CardTitle>Meetup Monitoring</CardTitle>
-                <CardDescription>
-                  Track scheduled, completed, and canceled meetups within the community.
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="h-64 flex items-center justify-center border rounded-md bg-muted/20">
-                  <p className="text-muted-foreground">Meetup statistics and monitoring will be displayed here</p>
-                </div>
-              </CardContent>
-            </Card>
+            <AdminMeetups />
           </TabsContent>
           
           <TabsContent value="announcements">
-            <Card>
-              <CardHeader>
-                <CardTitle>Broadcast Announcements</CardTitle>
-                <CardDescription>
-                  Send announcements and updates to community members.
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="h-64 flex items-center justify-center border rounded-md bg-muted/20">
-                  <p className="text-muted-foreground">Announcement broadcasting form will be displayed here</p>
-                </div>
-              </CardContent>
-            </Card>
+            <AdminAnnouncements />
           </TabsContent>
           
           <TabsContent value="settings">

@@ -19,6 +19,9 @@ const Hero: React.FC = () => {
               <Link to="/onboarding" className="btn-primary flex items-center justify-center gap-2">
                 Get Started <ArrowRight size={18} />
               </Link>
+              <Link to="/find-groups" className="btn-outline flex items-center justify-center">
+                Discover Communities
+              </Link>
               <Link to="/#how-it-works" className="btn-outline flex items-center justify-center">
                 Learn More
               </Link>

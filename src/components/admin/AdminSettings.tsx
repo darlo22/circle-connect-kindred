@@ -7,6 +7,7 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from '@/components/ui/accordion';
+import AdminCoAdmins from './AdminCoAdmins';
 
 const AdminSettings: React.FC = () => {
   return (
@@ -17,10 +18,7 @@ const AdminSettings: React.FC = () => {
           <CardDescription>Assign or remove co-admins for your community</CardDescription>
         </CardHeader>
         <CardContent>
-          <p className="text-muted-foreground mb-4">Co-admins can help manage members, approve join requests, and oversee events.</p>
-          <div className="h-32 flex items-center justify-center border rounded-md bg-muted/20">
-            <p className="text-muted-foreground">Co-admin assignment form will be displayed here</p>
-          </div>
+          <AdminCoAdmins />
         </CardContent>
       </Card>
 

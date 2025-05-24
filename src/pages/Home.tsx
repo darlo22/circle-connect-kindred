@@ -10,8 +10,6 @@ import CTA from '../components/home/CTA';
 import { useLocation } from 'react-router-dom';
 import { Card, CardContent } from '@/components/ui/card';
 import { mockCommunityData } from '@/data/mockCommunityData';
-import { Shield } from 'lucide-react';
-import { Button } from '@/components/ui/button';
 
 const Home: React.FC = () => {
   const location = useLocation();
@@ -65,29 +63,6 @@ const Home: React.FC = () => {
                 </CardContent>
               </Card>
             ))}
-          </div>
-          
-          {/* Admin Dashboard Quick Access Section */}
-          <div className="mt-12 p-6 bg-white rounded-xl shadow-md">
-            <div className="flex flex-col md:flex-row items-center justify-between gap-6">
-              <div>
-                <h3 className="text-2xl font-bold mb-2">Community Management</h3>
-                <p className="text-gray-600 max-w-xl">
-                  Access the admin dashboard to manage your communities, moderate members, 
-                  set matching rules, and monitor activities.
-                </p>
-              </div>
-              <Button 
-                size="lg"
-                className="bg-teal hover:bg-teal/90 text-white min-w-[200px]"
-                asChild
-              >
-                <Link to="/admin/dashboard" className="flex items-center gap-2">
-                  <Shield size={18} />
-                  Admin Dashboard
-                </Link>
-              </Button>
-            </div>
           </div>
         </div>
       </div>
