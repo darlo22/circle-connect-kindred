@@ -10,6 +10,7 @@ import CTA from '../components/home/CTA';
 import { useLocation } from 'react-router-dom';
 import { Card, CardContent } from '@/components/ui/card';
 import { mockCommunityData } from '@/data/mockCommunityData';
+import CommandCentre from '@/components/command-centre/CommandCentre';
 
 const Home: React.FC = () => {
   const location = useLocation();
@@ -37,6 +38,7 @@ const Home: React.FC = () => {
       <Hero />
       <Features />
       <HowItWorks />
+      <CommandCentre />
       <Testimonials />
       <div className="bg-cream py-16">
         <div className="container-custom">
