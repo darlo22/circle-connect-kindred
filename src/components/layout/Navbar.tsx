@@ -65,6 +65,7 @@ const Navbar: React.FC = () => {
                   Testimonials
                 </button>
                 <div className="space-x-2">
+                  <Link to="/command-centre" className="text-navy hover:text-teal transition-colors">Command Centre</Link>
                   <Link to="/login" className="btn-outline">Log In</Link>
                   <Link to="/onboarding" className="btn-primary">Sign Up</Link>
                 </div>
@@ -144,6 +145,13 @@ const Navbar: React.FC = () => {
                   >
                     Testimonials
                   </button>
+                  <Link 
+                    to="/command-centre" 
+                    className="text-navy hover:text-teal py-2 px-4 rounded-lg hover:bg-gray-50 transition-colors text-left"
+                    onClick={() => setIsMenuOpen(false)}
+                  >
+                    Command Centre
+                  </Link>
                   <div className="pt-2 grid grid-cols-2 gap-2">
                     <Link 
                       to="/login" 
