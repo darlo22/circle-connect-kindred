@@ -6,6 +6,7 @@ import IntentSelection from '../components/onboarding/IntentSelection';
 import PersonalInfo from '../components/onboarding/PersonalInfo';
 import MatchPreferences from '../components/onboarding/MatchPreferences';
 import DatingPreferences from '../components/onboarding/DatingPreferences';
+import InterestsSelection from '../components/onboarding/InterestsSelection';
 import ConnectionPreferences from '../components/onboarding/ConnectionPreferences';
 import ProfilePhoto from '../components/onboarding/ProfilePhoto';
 import Success from '../components/onboarding/Success';
