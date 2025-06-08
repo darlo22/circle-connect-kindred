@@ -15,6 +15,7 @@ import {
 
 interface PersonalInfoProps {
   onNext: (data: PersonalInfoData) => void;
+  intent?: string[];
 }
 
 interface PersonalInfoData {
@@ -23,15 +24,28 @@ interface PersonalInfoData {
   age: number;
   gender: string;
   maritalStatus: string;
+  ethnicity: string;
+  religion: string;
+  drinkingHabits: string;
+  smokingHabits: string;
 }
 
-const PersonalInfo: React.FC<PersonalInfoProps> = ({ onNext }) => {
+const ethnicityOptions = ['asian', 'black', 'hispanic', 'white', 'mixed', 'other', 'prefer-not-to-say'];
+const religionOptions = ['christian', 'muslim', 'jewish', 'hindu', 'buddhist', 'atheist', 'agnostic', 'other'];
+const drinkingOptions = ['never', 'occasionally', 'socially', 'regularly', 'prefer-not-to-say'];
+const smokingOptions = ['never', 'occasionally', 'socially', 'regularly', 'prefer-not-to-say'];
+
+const PersonalInfo: React.FC<PersonalInfoProps> = ({ onNext, intent }) => {
   const [formData, setFormData] = useState<PersonalInfoData>({
     firstName: '',
     lastName: '',
     age: 0,
     gender: '',
-    maritalStatus: ''
+    maritalStatus: '',
+    ethnicity: '',
+    religion: '',
+    drinkingHabits: '',
+    smokingHabits: ''
   });
   
   const [errors, setErrors] = useState<Record<string, string>>({});
@@ -85,6 +99,9 @@ const PersonalInfo: React.FC<PersonalInfoProps> = ({ onNext }) => {
       onNext(formData);
     }
   };
+
+  const formatLabel = (value: string) => 
+    value.split('-').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
   
   return (
     <div className="space-y-6">
@@ -191,6 +208,82 @@ const PersonalInfo: React.FC<PersonalInfoProps> = ({ onNext }) => {
           {errors.maritalStatus && (
             <p className="text-red-500 text-sm">{errors.maritalStatus}</p>
           )}
+        </div>
+
+        <div className="space-y-2">
+          <Label htmlFor="ethnicity">Ethnicity</Label>
+          <Select
+            value={formData.ethnicity}
+            onValueChange={(value) => handleChange('ethnicity', value)}
+          >
+            <SelectTrigger>
+              <SelectValue placeholder="Select your ethnicity" />
+            </SelectTrigger>
+            <SelectContent>
+              {ethnicityOptions.map(option => (
+                <SelectItem key={option} value={option}>
+                  {formatLabel(option)}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+
+        <div className="space-y-2">
+          <Label htmlFor="religion">Religion</Label>
+          <Select
+            value={formData.religion}
+            onValueChange={(value) => handleChange('religion', value)}
+          >
+            <SelectTrigger>
+              <SelectValue placeholder="Select your religion" />
+            </SelectTrigger>
+            <SelectContent>
+              {religionOptions.map(option => (
+                <SelectItem key={option} value={option}>
+                  {formatLabel(option)}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+
+        <div className="space-y-2">
+          <Label htmlFor="drinkingHabits">Drinking Habits</Label>
+          <Select
+            value={formData.drinkingHabits}
+            onValueChange={(value) => handleChange('drinkingHabits', value)}
+          >
+            <SelectTrigger>
+              <SelectValue placeholder="Select your drinking habits" />
+            </SelectTrigger>
+            <SelectContent>
+              {drinkingOptions.map(option => (
+                <SelectItem key={option} value={option}>
+                  {formatLabel(option)}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+
+        <div className="space-y-2">
+          <Label htmlFor="smokingHabits">Smoking Habits</Label>
+          <Select
+            value={formData.smokingHabits}
+            onValueChange={(value) => handleChange('smokingHabits', value)}
+          >
+            <SelectTrigger>
+              <SelectValue placeholder="Select your smoking habits" />
+            </SelectTrigger>
+            <SelectContent>
+              {smokingOptions.map(option => (
+                <SelectItem key={option} value={option}>
+                  {formatLabel(option)}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
         </div>
         
         <Button type="submit" className="w-full btn-primary gap-2 mt-6">

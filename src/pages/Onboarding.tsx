@@ -2,7 +2,10 @@
 import React, { useState } from 'react';
 import OnboardingLayout from '../components/onboarding/OnboardingLayout';
 import GroupJoin from '../components/onboarding/GroupJoin';
+import IntentSelection from '../components/onboarding/IntentSelection';
 import PersonalInfo from '../components/onboarding/PersonalInfo';
+import MatchPreferences from '../components/onboarding/MatchPreferences';
+import DatingPreferences from '../components/onboarding/DatingPreferences';
 import ConnectionPreferences from '../components/onboarding/ConnectionPreferences';
 import ProfilePhoto from '../components/onboarding/ProfilePhoto';
 import Success from '../components/onboarding/Success';
@@ -12,12 +15,31 @@ import Availability from '../components/onboarding/Availability';
 
 interface OnboardingData {
   groupId: string;
+  intent: string[];
   personalInfo: {
     firstName: string;
     lastName: string;
     age: number;
     gender: string;
     maritalStatus: string;
+    ethnicity: string;
+    religion: string;
+    drinkingHabits: string;
+    smokingHabits: string;
+    bodyType?: string;
+    hasChildren?: string;
+    wantsChildren?: string;
+  };
+  matchPreferences: {
+    maritalStatus: string[];
+    ageRange: { min: number; max: number };
+    ethnicity: string[];
+    religion: string[];
+    drinkingHabits: string[];
+    smokingHabits: string[];
+    bodyType?: string[];
+    childrenTolerance?: string[];
+    physicalPreferences?: string[];
   };
   location: {
     latitude: number | null;
@@ -45,7 +67,11 @@ const Onboarding: React.FC = () => {
   const [step, setStep] = useState(1);
   const [onboardingData, setOnboardingData] = useState<Partial<OnboardingData>>({});
   
-  const totalSteps = 7; // Total number of steps in the wizard
+  const getDynamicTotalSteps = () => {
+    const baseSteps = 9; // Base steps without dating preferences
+    const hasDatingIntent = onboardingData.intent?.includes('dating');
+    return hasDatingIntent ? baseSteps + 1 : baseSteps;
+  };
   
   const handleBack = () => {
     setStep(prev => Math.max(1, prev - 1));
@@ -55,56 +81,84 @@ const Onboarding: React.FC = () => {
     setOnboardingData(prev => ({ ...prev, groupId }));
     setStep(2);
   };
+
+  const handleIntentSelection = (intent: string[]) => {
+    setOnboardingData(prev => ({ ...prev, intent }));
+    setStep(3);
+  };
   
   const handlePersonalInfo = (personalInfo: OnboardingData['personalInfo']) => {
     setOnboardingData(prev => ({ ...prev, personalInfo }));
-    setStep(3);
+    setStep(4);
+  };
+
+  const handleMatchPreferences = (matchPreferences: OnboardingData['matchPreferences']) => {
+    setOnboardingData(prev => ({ ...prev, matchPreferences }));
+    // Skip to step 6 if no dating intent, otherwise go to step 5 for dating preferences
+    const hasDatingIntent = onboardingData.intent?.includes('dating');
+    setStep(hasDatingIntent ? 5 : 6);
+  };
+
+  const handleDatingPreferences = (datingPrefs: { personalInfo: Partial<OnboardingData['personalInfo']>, matchPreferences: Partial<OnboardingData['matchPreferences']> }) => {
+    setOnboardingData(prev => ({
+      ...prev,
+      personalInfo: { ...prev.personalInfo, ...datingPrefs.personalInfo },
+      matchPreferences: { ...prev.matchPreferences, ...datingPrefs.matchPreferences }
+    }));
+    setStep(6);
   };
 
   const handleGeolocation = (location: OnboardingData['location']) => {
     setOnboardingData(prev => ({ ...prev, location }));
-    setStep(4);
+    setStep(7);
   };
 
   const handleTemperament = (temperament: OnboardingData['temperament']) => {
     setOnboardingData(prev => ({ ...prev, temperament }));
-    setStep(5);
+    setStep(8);
   };
   
   const handleConnectionPreferences = (preferences: OnboardingData['preferences']) => {
     setOnboardingData(prev => ({ ...prev, preferences }));
-    setStep(6);
+    setStep(9);
   };
 
   const handleAvailability = (availability: OnboardingData['availability']) => {
     setOnboardingData(prev => ({ ...prev, availability }));
-    setStep(7);
+    setStep(10);
   };
   
   const handleProfilePhoto = (photoUrl: string) => {
     setOnboardingData(prev => ({ ...prev, photoUrl }));
-    // In a real app, we would send the complete onboardingData to the backend here
     console.log('Onboarding complete with data:', { ...onboardingData, photoUrl });
-    setStep(8);
+    setStep(11);
   };
   
   const renderStep = () => {
+    const hasDatingIntent = onboardingData.intent?.includes('dating');
+    
     switch (step) {
       case 1:
         return <GroupJoin onNext={handleGroupJoin} />;
       case 2:
-        return <PersonalInfo onNext={handlePersonalInfo} />;
+        return <IntentSelection onNext={handleIntentSelection} />;
       case 3:
-        return <Geolocation onNext={handleGeolocation} />;
+        return <PersonalInfo onNext={handlePersonalInfo} intent={onboardingData.intent} />;
       case 4:
-        return <Temperament onNext={handleTemperament} />;
+        return <MatchPreferences onNext={handleMatchPreferences} intent={onboardingData.intent} />;
       case 5:
-        return <ConnectionPreferences onNext={handleConnectionPreferences} />;
+        return hasDatingIntent ? <DatingPreferences onNext={handleDatingPreferences} /> : <Geolocation onNext={handleGeolocation} />;
       case 6:
-        return <Availability onNext={handleAvailability} />;
+        return <Geolocation onNext={handleGeolocation} />;
       case 7:
-        return <ProfilePhoto onNext={handleProfilePhoto} />;
+        return <Temperament onNext={handleTemperament} />;
       case 8:
+        return <ConnectionPreferences onNext={handleConnectionPreferences} />;
+      case 9:
+        return <Availability onNext={handleAvailability} />;
+      case 10:
+        return <ProfilePhoto onNext={handleProfilePhoto} />;
+      case 11:
         return <Success />;
       default:
         return null;
@@ -114,9 +168,9 @@ const Onboarding: React.FC = () => {
   return (
     <OnboardingLayout 
       currentStep={step} 
-      totalSteps={totalSteps}
+      totalSteps={getDynamicTotalSteps()}
       onBack={handleBack}
-      showBackButton={step < 8} // Hide back button on success page
+      showBackButton={step < 11}
     >
       {renderStep()}
     </OnboardingLayout>
