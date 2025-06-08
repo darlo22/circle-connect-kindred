@@ -42,7 +42,6 @@ const intentOptions = [
 
 const IntentSelection: React.FC<IntentSelectionProps> = ({ onNext }) => {
   const [selectedIntents, setSelectedIntents] = useState<string[]>([]);
-  const [error, setError] = useState<string>('');
 
   const handleIntentToggle = (intentId: string) => {
     setSelectedIntents(prev => {
@@ -52,18 +51,9 @@ const IntentSelection: React.FC<IntentSelectionProps> = ({ onNext }) => {
         return [...prev, intentId];
       }
     });
-    
-    if (error) {
-      setError('');
-    }
   };
 
   const handleSubmit = () => {
-    if (selectedIntents.length === 0) {
-      setError('Please select at least one connection type');
-      return;
-    }
-    
     onNext(selectedIntents);
   };
 
@@ -112,10 +102,6 @@ const IntentSelection: React.FC<IntentSelectionProps> = ({ onNext }) => {
           );
         })}
       </div>
-      
-      {error && (
-        <p className="text-red-500 text-sm text-center">{error}</p>
-      )}
       
       <Button 
         onClick={handleSubmit}
