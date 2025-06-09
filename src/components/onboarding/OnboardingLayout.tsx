@@ -9,6 +9,7 @@ interface OnboardingLayoutProps {
   totalSteps: number;
   onBack?: () => void;
   showBackButton?: boolean;
+  platform?: string | null;
 }
 
 const OnboardingLayout: React.FC<OnboardingLayoutProps> = ({
@@ -17,8 +18,11 @@ const OnboardingLayout: React.FC<OnboardingLayoutProps> = ({
   totalSteps,
   onBack,
   showBackButton = true,
+  platform,
 }) => {
   const progress = Math.round((currentStep / totalSteps) * 100);
+  const isCircleMate = platform === 'circlemate';
+  const progressColor = isCircleMate ? 'bg-teal' : 'bg-orange';
   
   return (
     <div className="min-h-screen flex flex-col">
@@ -34,6 +38,15 @@ const OnboardingLayout: React.FC<OnboardingLayoutProps> = ({
             </button>
           )}
           <Logo size="small" />
+          {platform && (
+            <div className={`px-3 py-1 rounded-full text-xs font-medium ${
+              isCircleMate 
+                ? 'bg-teal/10 text-teal' 
+                : 'bg-orange/10 text-orange'
+            }`}>
+              {isCircleMate ? 'CircleMate' : 'CircleMate+'}
+            </div>
+          )}
         </div>
         <div className="text-sm text-gray-500">
           Step {currentStep} of {totalSteps}
@@ -42,7 +55,7 @@ const OnboardingLayout: React.FC<OnboardingLayoutProps> = ({
       
       <div className="h-2 w-full bg-gray-100">
         <div 
-          className="h-full bg-teal transition-all duration-500 ease-in-out"
+          className={`h-full transition-all duration-500 ease-in-out ${progressColor}`}
           style={{ width: `${progress}%` }}
         ></div>
       </div>

@@ -1,5 +1,5 @@
-
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import OnboardingLayout from '../components/onboarding/OnboardingLayout';
 import GroupJoin from '../components/onboarding/GroupJoin';
 import IntentSelection from '../components/onboarding/IntentSelection';
@@ -65,17 +65,29 @@ interface OnboardingData {
 }
 
 const Onboarding: React.FC = () => {
+  const [searchParams] = useSearchParams();
   const [step, setStep] = useState(1);
   const [onboardingData, setOnboardingData] = useState<Partial<OnboardingData>>({});
   
+  const platform = searchParams.get('platform'); // 'circlemate' or 'circlemate-plus'
+  const joinMode = searchParams.get('join'); // 'browse' for community browsing
+  
+  useEffect(() => {
+    // If user chose to browse communities, skip group join step
+    if (joinMode === 'browse') {
+      setStep(2);
+      setOnboardingData(prev => ({ ...prev, groupId: 'browse' }));
+    }
+  }, [joinMode]);
+  
   const getDynamicTotalSteps = () => {
-    const baseSteps = 9; // Base steps without dating preferences
+    const baseSteps = joinMode === 'browse' ? 10 : 11; // Skip group join if browsing
     const hasDatingIntent = onboardingData.intent?.includes('dating');
     return hasDatingIntent ? baseSteps + 1 : baseSteps;
   };
   
   const handleBack = () => {
-    setStep(prev => Math.max(1, prev - 1));
+    setStep(prev => Math.max(joinMode === 'browse' ? 2 : 1, prev - 1));
   };
   
   const handleGroupJoin = (groupId: string) => {
@@ -134,44 +146,56 @@ const Onboarding: React.FC = () => {
     console.log('Onboarding complete with data:', { ...onboardingData, photoUrl });
     setStep(11);
   };
+
+  const handleInterestsSelection = (interests: { selectedInterests: string[]; matchPreferences: string[]; }) => {
+    setOnboardingData(prev => ({ ...prev, interests }));
+    setStep(7);
+  };
   
   const renderStep = () => {
     const hasDatingIntent = onboardingData.intent?.includes('dating');
+    const adjustedStep = joinMode === 'browse' ? step + 1 : step;
     
-    switch (step) {
+    switch (adjustedStep) {
       case 1:
-        return <GroupJoin onNext={handleGroupJoin} />;
+        return <GroupJoin onNext={handleGroupJoin} platform={platform} />;
       case 2:
-        return <IntentSelection onNext={handleIntentSelection} />;
+        return <IntentSelection onNext={handleIntentSelection} platform={platform} />;
       case 3:
         return <PersonalInfo onNext={handlePersonalInfo} intent={onboardingData.intent} />;
       case 4:
         return <MatchPreferences onNext={handleMatchPreferences} intent={onboardingData.intent} />;
       case 5:
-        return hasDatingIntent ? <DatingPreferences onNext={handleDatingPreferences} /> : <Geolocation onNext={handleGeolocation} />;
+        return hasDatingIntent ? <DatingPreferences onNext={handleDatingPreferences} /> : <InterestsSelection onNext={handleInterestsSelection} />;
       case 6:
-        return <Geolocation onNext={handleGeolocation} />;
+        return <InterestsSelection onNext={handleInterestsSelection} />;
       case 7:
-        return <Temperament onNext={handleTemperament} />;
+        return <Geolocation onNext={handleGeolocation} />;
       case 8:
-        return <ConnectionPreferences onNext={handleConnectionPreferences} />;
+        return <Temperament onNext={handleTemperament} />;
       case 9:
-        return <Availability onNext={handleAvailability} />;
+        return <ConnectionPreferences onNext={handleConnectionPreferences} />;
       case 10:
-        return <ProfilePhoto onNext={handleProfilePhoto} />;
+        return <Availability onNext={handleAvailability} />;
       case 11:
-        return <Success />;
+        return <ProfilePhoto onNext={handleProfilePhoto} />;
+      case 12:
+        return <Success platform={platform} />;
       default:
         return null;
     }
   };
   
+  const currentDisplayStep = joinMode === 'browse' ? step - 1 : step;
+  const showBackButton = currentDisplayStep > 1 && currentDisplayStep < getDynamicTotalSteps() + 1;
+  
   return (
     <OnboardingLayout 
-      currentStep={step} 
+      currentStep={currentDisplayStep} 
       totalSteps={getDynamicTotalSteps()}
       onBack={handleBack}
-      showBackButton={step < 11}
+      showBackButton={showBackButton}
+      platform={platform}
     >
       {renderStep()}
     </OnboardingLayout>
