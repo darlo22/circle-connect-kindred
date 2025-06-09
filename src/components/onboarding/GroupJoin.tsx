@@ -46,6 +46,10 @@ const GroupJoin: React.FC<GroupJoinProps> = ({ onNext, platform }) => {
     }
   };
 
+  const handleContinueWithoutCommunity = () => {
+    onNext('skip');
+  };
+
   const platformIcon = isCircleMate ? Church : Globe;
   const platformColor = isCircleMate ? 'text-teal' : 'text-orange';
 
@@ -128,13 +132,23 @@ const GroupJoin: React.FC<GroupJoinProps> = ({ onNext, platform }) => {
         </TabsContent>
       </Tabs>
 
-      <Button 
-        className={`w-full gap-2 ${isCircleMate ? 'btn-primary' : 'bg-orange hover:bg-orange/90 text-white'}`}
-        disabled={!selectedGroup && !groupCode.trim()}
-        onClick={handleContinue}
-      >
-        Continue <ArrowRight size={18} />
-      </Button>
+      <div className="space-y-3">
+        <Button 
+          className={`w-full gap-2 ${isCircleMate ? 'btn-primary' : 'bg-orange hover:bg-orange/90 text-white'}`}
+          disabled={!selectedGroup && !groupCode.trim()}
+          onClick={handleContinue}
+        >
+          Continue <ArrowRight size={18} />
+        </Button>
+        
+        <Button 
+          variant="outline"
+          className="w-full font-bold text-base border-2"
+          onClick={handleContinueWithoutCommunity}
+        >
+          Continue without Community
+        </Button>
+      </div>
     </div>
   );
 };

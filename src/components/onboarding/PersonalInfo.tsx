@@ -4,7 +4,6 @@ import { ArrowRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import {
   Select,
   SelectContent,
@@ -14,7 +13,7 @@ import {
 } from '@/components/ui/select';
 
 interface PersonalInfoProps {
-  onNext: (data: PersonalInfoData) => void;
+  onNext: (personalInfo: PersonalInfoData) => void;
   intent?: string[];
 }
 
@@ -28,195 +27,204 @@ interface PersonalInfoData {
   religion: string;
   drinkingHabits: string;
   smokingHabits: string;
+  bodyType?: string;
+  hasChildren?: string;
+  wantsChildren?: string;
 }
 
+const genderOptions = ['male', 'female', 'non-binary', 'prefer-not-to-say'];
+const maritalOptions = ['single', 'married', 'divorced', 'widowed', 'other'];
 const ethnicityOptions = ['asian', 'black', 'hispanic', 'white', 'mixed', 'other', 'prefer-not-to-say'];
 const religionOptions = ['christian', 'muslim', 'jewish', 'hindu', 'buddhist', 'atheist', 'agnostic', 'other'];
 const drinkingOptions = ['never', 'occasionally', 'socially', 'regularly', 'prefer-not-to-say'];
 const smokingOptions = ['never', 'occasionally', 'socially', 'regularly', 'prefer-not-to-say'];
+const bodyTypeOptions = ['slim', 'average', 'athletic', 'curvy', 'plus-size', 'prefer-not-to-say'];
+const childrenOptions = ['yes', 'no', 'prefer-not-to-say'];
 
 const PersonalInfo: React.FC<PersonalInfoProps> = ({ onNext, intent }) => {
-  const [formData, setFormData] = useState<PersonalInfoData>({
+  // Get platform from URL params
+  const urlParams = new URLSearchParams(window.location.search);
+  const platform = urlParams.get('platform');
+  const isCircleMate = platform === 'circlemate';
+  
+  const [personalInfo, setPersonalInfo] = useState<PersonalInfoData>({
     firstName: '',
     lastName: '',
-    age: 0,
+    age: 18,
     gender: '',
     maritalStatus: '',
     ethnicity: '',
-    religion: '',
-    drinkingHabits: '',
-    smokingHabits: ''
+    religion: isCircleMate ? 'christian' : '', // Default to christian for CircleMate
+    drinkingHabits: isCircleMate ? 'never' : '', // Default to never for CircleMate
+    smokingHabits: isCircleMate ? 'never' : '', // Default to never for CircleMate
+    bodyType: '',
+    hasChildren: '',
+    wantsChildren: ''
   });
   
   const [errors, setErrors] = useState<Record<string, string>>({});
-  
-  const handleChange = (field: keyof PersonalInfoData, value: string | number) => {
-    setFormData(prev => ({
-      ...prev,
-      [field]: value
-    }));
-    
-    // Clear error when field is changed
+  const hasDatingIntent = intent?.includes('dating');
+
+  const handleInputChange = (field: keyof PersonalInfoData, value: string | number) => {
+    setPersonalInfo(prev => ({ ...prev, [field]: value }));
     if (errors[field]) {
-      setErrors(prev => ({
-        ...prev,
-        [field]: ''
-      }));
+      setErrors(prev => ({ ...prev, [field]: '' }));
     }
   };
-  
+
   const validateForm = () => {
     const newErrors: Record<string, string> = {};
     
-    if (!formData.firstName.trim()) {
+    if (!personalInfo.firstName.trim()) {
       newErrors.firstName = 'First name is required';
     }
     
-    if (!formData.lastName.trim()) {
+    if (!personalInfo.lastName.trim()) {
       newErrors.lastName = 'Last name is required';
     }
     
-    if (!formData.age || formData.age < 18) {
-      newErrors.age = 'You must be at least 18 years old';
+    if (personalInfo.age < 18 || personalInfo.age > 100) {
+      newErrors.age = 'Age must be between 18 and 100';
     }
     
-    if (!formData.gender) {
+    if (!personalInfo.gender) {
       newErrors.gender = 'Please select your gender';
     }
     
-    if (!formData.maritalStatus) {
+    if (!personalInfo.maritalStatus) {
       newErrors.maritalStatus = 'Please select your marital status';
+    }
+    
+    if (!personalInfo.ethnicity) {
+      newErrors.ethnicity = 'Please select your ethnicity';
+    }
+    
+    // Only validate religion, drinking, and smoking for non-CircleMate platforms
+    if (!isCircleMate) {
+      if (!personalInfo.religion) {
+        newErrors.religion = 'Please select your religion';
+      }
+      
+      if (!personalInfo.drinkingHabits) {
+        newErrors.drinkingHabits = 'Please select your drinking habits';
+      }
+      
+      if (!personalInfo.smokingHabits) {
+        newErrors.smokingHabits = 'Please select your smoking habits';
+      }
     }
     
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
-  
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    
+
+  const handleSubmit = () => {
     if (validateForm()) {
-      onNext(formData);
+      onNext(personalInfo);
     }
   };
 
   const formatLabel = (value: string) => 
-    value.split('-').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
-  
+    value.charAt(0).toUpperCase() + value.slice(1).replace('-', ' ');
+
   return (
     <div className="space-y-6">
       <div className="text-center">
-        <h1 className="text-2xl font-bold mb-2 text-navy">Tell Us About Yourself</h1>
+        <h1 className="text-2xl font-bold mb-2 text-navy">Tell us about yourself</h1>
         <p className="text-gray-600">
-          This information helps us find better matches for you.
+          This information helps us find the best connections for you.
         </p>
       </div>
       
-      <form onSubmit={handleSubmit} className="space-y-4">
+      <div className="space-y-4">
         <div className="grid grid-cols-2 gap-4">
-          <div className="space-y-2">
+          <div>
             <Label htmlFor="firstName">First Name</Label>
             <Input
               id="firstName"
-              placeholder="Your first name"
+              type="text"
+              value={personalInfo.firstName}
+              onChange={(e) => handleInputChange('firstName', e.target.value)}
               className={errors.firstName ? 'border-red-500' : ''}
-              value={formData.firstName}
-              onChange={(e) => handleChange('firstName', e.target.value)}
             />
             {errors.firstName && (
-              <p className="text-red-500 text-sm">{errors.firstName}</p>
+              <p className="text-red-500 text-sm mt-1">{errors.firstName}</p>
             )}
           </div>
           
-          <div className="space-y-2">
+          <div>
             <Label htmlFor="lastName">Last Name</Label>
             <Input
               id="lastName"
-              placeholder="Your last name"
+              type="text"
+              value={personalInfo.lastName}
+              onChange={(e) => handleInputChange('lastName', e.target.value)}
               className={errors.lastName ? 'border-red-500' : ''}
-              value={formData.lastName}
-              onChange={(e) => handleChange('lastName', e.target.value)}
             />
             {errors.lastName && (
-              <p className="text-red-500 text-sm">{errors.lastName}</p>
+              <p className="text-red-500 text-sm mt-1">{errors.lastName}</p>
             )}
           </div>
         </div>
         
-        <div className="space-y-2">
+        <div>
           <Label htmlFor="age">Age</Label>
           <Input
             id="age"
             type="number"
-            placeholder="Your age"
-            min={18}
+            min="18"
+            max="100"
+            value={personalInfo.age}
+            onChange={(e) => handleInputChange('age', parseInt(e.target.value) || 18)}
             className={errors.age ? 'border-red-500' : ''}
-            value={formData.age || ''}
-            onChange={(e) => handleChange('age', Number(e.target.value))}
           />
           {errors.age && (
-            <p className="text-red-500 text-sm">{errors.age}</p>
+            <p className="text-red-500 text-sm mt-1">{errors.age}</p>
           )}
         </div>
         
-        <div className="space-y-2">
+        <div>
           <Label>Gender</Label>
-          <RadioGroup
-            value={formData.gender}
-            onValueChange={(value) => handleChange('gender', value)}
-            className="flex flex-col space-y-1"
-          >
-            <div className="flex items-center space-x-2">
-              <RadioGroupItem value="male" id="male" />
-              <Label htmlFor="male">Male</Label>
-            </div>
-            <div className="flex items-center space-x-2">
-              <RadioGroupItem value="female" id="female" />
-              <Label htmlFor="female">Female</Label>
-            </div>
-            <div className="flex items-center space-x-2">
-              <RadioGroupItem value="non-binary" id="non-binary" />
-              <Label htmlFor="non-binary">Non-binary</Label>
-            </div>
-            <div className="flex items-center space-x-2">
-              <RadioGroupItem value="prefer-not-to-say" id="prefer-not-to-say" />
-              <Label htmlFor="prefer-not-to-say">Prefer not to say</Label>
-            </div>
-          </RadioGroup>
+          <Select onValueChange={(value) => handleInputChange('gender', value)}>
+            <SelectTrigger className={errors.gender ? 'border-red-500' : ''}>
+              <SelectValue placeholder="Select your gender" />
+            </SelectTrigger>
+            <SelectContent>
+              {genderOptions.map(option => (
+                <SelectItem key={option} value={option}>
+                  {formatLabel(option)}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
           {errors.gender && (
-            <p className="text-red-500 text-sm">{errors.gender}</p>
+            <p className="text-red-500 text-sm mt-1">{errors.gender}</p>
           )}
         </div>
         
-        <div className="space-y-2">
-          <Label htmlFor="maritalStatus">Marital Status</Label>
-          <Select
-            value={formData.maritalStatus}
-            onValueChange={(value) => handleChange('maritalStatus', value)}
-          >
+        <div>
+          <Label>Marital Status</Label>
+          <Select onValueChange={(value) => handleInputChange('maritalStatus', value)}>
             <SelectTrigger className={errors.maritalStatus ? 'border-red-500' : ''}>
               <SelectValue placeholder="Select your marital status" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="single">Single</SelectItem>
-              <SelectItem value="married">Married</SelectItem>
-              <SelectItem value="divorced">Divorced</SelectItem>
-              <SelectItem value="widowed">Widowed</SelectItem>
-              <SelectItem value="other">Other</SelectItem>
+              {maritalOptions.map(option => (
+                <SelectItem key={option} value={option}>
+                  {formatLabel(option)}
+                </SelectItem>
+              ))}
             </SelectContent>
           </Select>
           {errors.maritalStatus && (
-            <p className="text-red-500 text-sm">{errors.maritalStatus}</p>
+            <p className="text-red-500 text-sm mt-1">{errors.maritalStatus}</p>
           )}
         </div>
-
-        <div className="space-y-2">
-          <Label htmlFor="ethnicity">Ethnicity</Label>
-          <Select
-            value={formData.ethnicity}
-            onValueChange={(value) => handleChange('ethnicity', value)}
-          >
-            <SelectTrigger>
+        
+        <div>
+          <Label>Ethnicity</Label>
+          <Select onValueChange={(value) => handleInputChange('ethnicity', value)}>
+            <SelectTrigger className={errors.ethnicity ? 'border-red-500' : ''}>
               <SelectValue placeholder="Select your ethnicity" />
             </SelectTrigger>
             <SelectContent>
@@ -227,69 +235,131 @@ const PersonalInfo: React.FC<PersonalInfoProps> = ({ onNext, intent }) => {
               ))}
             </SelectContent>
           </Select>
-        </div>
-
-        <div className="space-y-2">
-          <Label htmlFor="religion">Religion</Label>
-          <Select
-            value={formData.religion}
-            onValueChange={(value) => handleChange('religion', value)}
-          >
-            <SelectTrigger>
-              <SelectValue placeholder="Select your religion" />
-            </SelectTrigger>
-            <SelectContent>
-              {religionOptions.map(option => (
-                <SelectItem key={option} value={option}>
-                  {formatLabel(option)}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </div>
-
-        <div className="space-y-2">
-          <Label htmlFor="drinkingHabits">Drinking Habits</Label>
-          <Select
-            value={formData.drinkingHabits}
-            onValueChange={(value) => handleChange('drinkingHabits', value)}
-          >
-            <SelectTrigger>
-              <SelectValue placeholder="Select your drinking habits" />
-            </SelectTrigger>
-            <SelectContent>
-              {drinkingOptions.map(option => (
-                <SelectItem key={option} value={option}>
-                  {formatLabel(option)}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </div>
-
-        <div className="space-y-2">
-          <Label htmlFor="smokingHabits">Smoking Habits</Label>
-          <Select
-            value={formData.smokingHabits}
-            onValueChange={(value) => handleChange('smokingHabits', value)}
-          >
-            <SelectTrigger>
-              <SelectValue placeholder="Select your smoking habits" />
-            </SelectTrigger>
-            <SelectContent>
-              {smokingOptions.map(option => (
-                <SelectItem key={option} value={option}>
-                  {formatLabel(option)}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+          {errors.ethnicity && (
+            <p className="text-red-500 text-sm mt-1">{errors.ethnicity}</p>
+          )}
         </div>
         
-        <Button type="submit" className="w-full btn-primary gap-2 mt-6">
-          Continue <ArrowRight size={18} />
-        </Button>
-      </form>
+        {!isCircleMate && (
+          <>
+            <div>
+              <Label>Religion</Label>
+              <Select onValueChange={(value) => handleInputChange('religion', value)}>
+                <SelectTrigger className={errors.religion ? 'border-red-500' : ''}>
+                  <SelectValue placeholder="Select your religion" />
+                </SelectTrigger>
+                <SelectContent>
+                  {religionOptions.map(option => (
+                    <SelectItem key={option} value={option}>
+                      {formatLabel(option)}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              {errors.religion && (
+                <p className="text-red-500 text-sm mt-1">{errors.religion}</p>
+              )}
+            </div>
+            
+            <div>
+              <Label>Drinking Habits</Label>
+              <Select onValueChange={(value) => handleInputChange('drinkingHabits', value)}>
+                <SelectTrigger className={errors.drinkingHabits ? 'border-red-500' : ''}>
+                  <SelectValue placeholder="Select your drinking habits" />
+                </SelectTrigger>
+                <SelectContent>
+                  {drinkingOptions.map(option => (
+                    <SelectItem key={option} value={option}>
+                      {formatLabel(option)}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              {errors.drinkingHabits && (
+                <p className="text-red-500 text-sm mt-1">{errors.drinkingHabits}</p>
+              )}
+            </div>
+            
+            <div>
+              <Label>Smoking Habits</Label>
+              <Select onValueChange={(value) => handleInputChange('smokingHabits', value)}>
+                <SelectTrigger className={errors.smokingHabits ? 'border-red-500' : ''}>
+                  <SelectValue placeholder="Select your smoking habits" />
+                </SelectTrigger>
+                <SelectContent>
+                  {smokingOptions.map(option => (
+                    <SelectItem key={option} value={option}>
+                      {formatLabel(option)}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              {errors.smokingHabits && (
+                <p className="text-red-500 text-sm mt-1">{errors.smokingHabits}</p>
+              )}
+            </div>
+          </>
+        )}
+        
+        {hasDatingIntent && (
+          <>
+            <div>
+              <Label>Body Type</Label>
+              <Select onValueChange={(value) => handleInputChange('bodyType', value)}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Select your body type (optional)" />
+                </SelectTrigger>
+                <SelectContent>
+                  {bodyTypeOptions.map(option => (
+                    <SelectItem key={option} value={option}>
+                      {formatLabel(option)}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            
+            <div>
+              <Label>Do you have children?</Label>
+              <Select onValueChange={(value) => handleInputChange('hasChildren', value)}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Do you have children? (optional)" />
+                </SelectTrigger>
+                <SelectContent>
+                  {childrenOptions.map(option => (
+                    <SelectItem key={option} value={option}>
+                      {formatLabel(option)}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            
+            <div>
+              <Label>Do you want children?</Label>
+              <Select onValueChange={(value) => handleInputChange('wantsChildren', value)}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Do you want children? (optional)" />
+                </SelectTrigger>
+                <SelectContent>
+                  {childrenOptions.map(option => (
+                    <SelectItem key={option} value={option}>
+                      {formatLabel(option)}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+          </>
+        )}
+      </div>
+      
+      <Button 
+        onClick={handleSubmit}
+        className="w-full btn-primary gap-2 mt-6"
+      >
+        Continue <ArrowRight size={18} />
+      </Button>
     </div>
   );
 };
