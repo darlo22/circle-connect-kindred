@@ -7,6 +7,7 @@ import { Checkbox } from '@/components/ui/checkbox';
 
 interface IntentSelectionProps {
   onNext: (intent: string[]) => void;
+  platform?: string | null;
 }
 
 const intentOptions = [
@@ -40,7 +41,7 @@ const intentOptions = [
   }
 ];
 
-const IntentSelection: React.FC<IntentSelectionProps> = ({ onNext }) => {
+const IntentSelection: React.FC<IntentSelectionProps> = ({ onNext, platform }) => {
   const [selectedIntents, setSelectedIntents] = useState<string[]>([]);
 
   const handleIntentToggle = (intentId: string) => {
