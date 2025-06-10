@@ -65,8 +65,19 @@ const Geolocation: React.FC<GeolocationProps> = ({ onNext }) => {
     // Check if user has either provided location or entered an address
     if (!location.latitude && !location.longitude && !address.trim()) {
       setError('Please either allow location access or enter your address.');
+      toast({
+        variant: "destructive",
+        title: "Location required",
+        description: "Please either allow location access or enter your address to continue.",
+      });
       return;
     }
+
+    console.log('Continuing to next step with location data:', {
+      latitude: location.latitude,
+      longitude: location.longitude,
+      address: address.trim(),
+    });
 
     // Call onNext to advance to the next step
     onNext({
@@ -139,6 +150,7 @@ const Geolocation: React.FC<GeolocationProps> = ({ onNext }) => {
       <Button 
         onClick={handleSubmit}
         className="w-full btn-primary gap-2 mt-6"
+        disabled={isLoading}
       >
         Continue <ArrowRight size={18} />
       </Button>
