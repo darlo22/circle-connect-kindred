@@ -59,11 +59,16 @@ const Geolocation: React.FC<GeolocationProps> = ({ onNext }) => {
   };
 
   const handleSubmit = () => {
+    // Reset any previous errors
+    setError(null);
+    
+    // Check if user has either provided location or entered an address
     if (!location.latitude && !location.longitude && !address.trim()) {
       setError('Please either allow location access or enter your address.');
       return;
     }
 
+    // Call onNext to advance to the next step
     onNext({
       latitude: location.latitude,
       longitude: location.longitude,
